@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QTextBrowser>
 #include <iostream>
+#include "File.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,33 +19,42 @@ void MainWindow::open()
     std::cout<<"chosen files:"<<std::endl;
     for(auto itr: files)
     {
-        QString filename;
-        for(QChar* qch=itr.data(); qch-itr.data()<itr.length(); ++qch)
-        {
-            std::cout<<qch->toLatin1();
-            //if(qch->toLatin1()=='/') filename+="\\";
-            filename+=qch->toLatin1();
-        }
-        std::cout<<std::endl;
+        QString filename=Ui::binaryToQString(itr);
+        File::File file{filename};
+        //debug output
+        file.output();
 
         //perhaps uneffective way to read file, but gonna try
         QTextDocument* doc=new QTextDocument();
-        QFile file{filename};
-        file.open(QIODeviceBase::ReadOnly);
-        QString content;
-
-        while(!file.atEnd())
-        {
-            content+=file.readLine();
-            content+="\n";
-        }
-        file.close();
+        QString content=file.read();
         doc->setPlainText(content);
 
         QTextEdit* qte=new QTextEdit(this);
         qte->setDocument(doc);
-        ui->FileTabs->addTab(qte, filename);
+        ui->FileTabs->addTab(qte, QUrl::fromLocalFile(filename).fileName());
     }
+}
+
+QString Ui::qStringOut(QString& str, std::ostream& stream)
+{
+    QString latin_str;
+    for(QChar* qch=str.data(); qch-str.data()<str.length(); ++qch)
+    {
+        stream<<qch->toLatin1();
+        latin_str+=qch->toLatin1();
+    }
+    stream<<std::endl;
+    return latin_str;
+}
+
+QString Ui::binaryToQString(QString& str)
+{
+    QString latin_str;
+    for(QChar* qch=str.data(); qch-str.data()<str.length(); ++qch)
+    {
+        latin_str+=qch->toLatin1();
+    }
+    return latin_str;
 }
 
 MainWindow::~MainWindow()

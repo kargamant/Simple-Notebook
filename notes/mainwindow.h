@@ -2,10 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <iostream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
+QString qStringOut(QString& str, std::ostream& stream=std::cout);
+QString binaryToQString(QString& str);
 }
 QT_END_NAMESPACE
 
