@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::open()
 {
-    QStringList files=QFileDialog::getOpenFileNames(this, "Choose a file", "C:\\Users\\Honor", "*.txt *.cpp *.c *.py");
+    QStringList files=QFileDialog::getOpenFileNames(this, "Choose a file", "C:\\Users\\Honor", "*.txt *.h *.cpp *.c *.py");
     std::cout<<"chosen files:"<<std::endl;
     for(auto itr: files)
     {
@@ -27,15 +27,32 @@ void MainWindow::open()
         }
         std::cout<<std::endl;
 
-        QTextBrowser* qb=new QTextBrowser(this); //set to textedit
+        //perhaps uneffective way to read file, but gonna try
+        QTextDocument* doc=new QTextDocument();
+        QFile file{filename};
+        file.open(QIODeviceBase::ReadOnly);
+        QString content;
 
-        qb->setSource(QUrl::fromLocalFile(filename));
-        ui->FileTabs->addTab(qb, filename);
+        while(!file.atEnd())
+        {
+            content+=file.readLine();
+            content+="\n";
+        }
+        file.close();
+        doc->setPlainText(content);
+
+        QTextEdit* qte=new QTextEdit(this);
+        qte->setDocument(doc);
+        ui->FileTabs->addTab(qte, filename);
     }
 }
 
 MainWindow::~MainWindow()
 {
-    for(int i=0; i<ui->FileTabs->count(); i++) delete ui->FileTabs->widget(i);
+    for(int i=0; i<ui->FileTabs->count(); i++)
+    {
+        delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
+        delete ui->FileTabs->widget(i);
+    }
     delete ui;
 }
