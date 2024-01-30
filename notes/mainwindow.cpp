@@ -45,10 +45,10 @@ void MainWindow::open()
     }
 }
 
-QString Ui::qStringOut(QString& str, std::ostream& stream)
+QString Ui::qStringOut(const QString& str, std::ostream& stream)
 {
     QString latin_str;
-    for(QChar* qch=str.data(); qch-str.data()<str.length(); ++qch)
+    for(const QChar* qch=str.data(); qch-str.data()<str.length(); ++qch)
     {
         stream<<qch->toLatin1();
         latin_str+=qch->toLatin1();

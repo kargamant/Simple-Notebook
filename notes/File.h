@@ -18,6 +18,7 @@ namespace File
         //QString getFileName();
         QString output(std::ostream& stream=std::cout);
         QString read();
+        //QString highlight();
     };
 }
 #endif // FILE_H

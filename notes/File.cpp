@@ -26,4 +26,6 @@ QString File::output(std::ostream& stream)
         this->close();
         return content;
     }
+
+
 }

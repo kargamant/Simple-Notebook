@@ -8,7 +8,7 @@
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
-QString qStringOut(QString& str, std::ostream& stream=std::cout);
+QString qStringOut(const QString& str, std::ostream& stream=std::cout);
 QString binaryToQString(QString& str);
 }
 QT_END_NAMESPACE
