@@ -21,25 +21,27 @@ void MainWindow::open()
     for(auto itr: files)
     {
         QString filename=Ui::binaryToQString(itr);
-        File::File file{filename};
+        File::File* file=new File::File{filename};
         //debug output
-        file.output();
+        file->output();
 
         //perhaps uneffective way to read file, but gonna try
         QTextDocument* doc=new QTextDocument();
-        QString content=file.read();
+        QString content=file->read();
         doc->setPlainText(content);
 
         QTextEdit* qte=new QTextEdit(this);
         qte->setDocument(doc);
 
         //highlighting
+        QSyntaxHighlighter* highlighter;
         if(QUrl::fromLocalFile(filename).fileName().endsWith(".cpp") || QUrl::fromLocalFile(filename).fileName().endsWith(".h"))
         {
-            Syntax::CppHighlighter* cpp=new Syntax::CppHighlighter(qte->document());
+            highlighter=new Syntax::CppHighlighter(qte->document());
+            file->highlighter=highlighter;
         }
-
         ui->FileTabs->addTab(qte, QUrl::fromLocalFile(filename).fileName());
+        this->files.push_back(file);
     }
 }
 
@@ -69,6 +71,7 @@ MainWindow::~MainWindow()
 {
     for(int i=0; i<ui->FileTabs->count(); i++)
     {
+        delete files[i];
         delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
         delete ui->FileTabs->widget(i);
     }

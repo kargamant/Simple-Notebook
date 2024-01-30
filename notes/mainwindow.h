@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <iostream>
+#include "File.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,5 +24,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    std::vector<File::File*> files;
 };
 #endif // MAINWINDOW_H
