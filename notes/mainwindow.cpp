@@ -4,6 +4,7 @@
 #include <QTextBrowser>
 #include <iostream>
 #include "File.h"
+#include "CppHighlighter.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,6 +32,13 @@ void MainWindow::open()
 
         QTextEdit* qte=new QTextEdit(this);
         qte->setDocument(doc);
+
+        //highlighting
+        if(QUrl::fromLocalFile(filename).fileName().endsWith(".cpp") || QUrl::fromLocalFile(filename).fileName().endsWith(".h"))
+        {
+            Syntax::CppHighlighter* cpp=new Syntax::CppHighlighter(qte->document());
+        }
+
         ui->FileTabs->addTab(qte, QUrl::fromLocalFile(filename).fileName());
     }
 }

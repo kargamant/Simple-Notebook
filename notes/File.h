@@ -8,7 +8,7 @@ namespace File
     class File : public QFile
     {
     public:
-        File(QString& filename) : QFile(filename) {}
+        File(const QString& filename) : QFile(filename) {}
         //QString getFileName();
         QString output(std::ostream& stream=std::cout);
         QString read();

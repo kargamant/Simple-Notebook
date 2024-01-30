@@ -3,7 +3,7 @@
 
 namespace File
 {
-    QString File::output(std::ostream& stream)
+QString File::output(std::ostream& stream)
     {
         QString name=fileName();
         QString out=Ui::binaryToQString(name);
