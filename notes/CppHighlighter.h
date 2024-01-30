@@ -15,6 +15,18 @@ namespace Syntax
     class CppHighlighter: public QSyntaxHighlighter
     {
     private:
+        //default rules
+        Rule classRule;
+        Rule namespaceRule;
+        Rule commentRule;
+        Rule multiLineCommentRuleStart;
+        Rule multiLineCommentRuleEnd;
+        Rule functionRule;
+        Rule emptyFunctionRule;
+        Rule constructorRule;
+        Rule defaultConstructorRule;
+        Rule destructorRule;
+
         std::vector<Rule> ruleSet;
         //void loadFromFile(const std::string& filename);
         void defaultRuleSet();

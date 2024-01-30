@@ -9,38 +9,58 @@ namespace Syntax
         //rules for keywords
 
         //keywords
-        Rule classRule;
         classRule.pattern.setPattern("class");
         classRule.format.setFontWeight(QFont::Bold);
         classRule.format.setForeground(Qt::blue);
 
-        Rule namespaceRule;
         namespaceRule.pattern.setPattern("namespace");
         namespaceRule.format.setFontWeight(QFont::Bold);
         namespaceRule.format.setForeground(Qt::blue);
 
         //comments
-        Rule commentRule;
         commentRule.pattern.setPattern("//.*+");
         commentRule.format.setFontItalic(true);
         commentRule.format.setForeground(Qt::darkGreen);
 
 
-        Rule multiLineCommentRuleStart;
         multiLineCommentRuleStart.pattern.setPattern("\(/\\*\)");
         multiLineCommentRuleStart.format.setFontItalic(true);
         multiLineCommentRuleStart.format.setForeground(Qt::darkGreen);
 
-        Rule multiLineCommentRuleEnd;
         multiLineCommentRuleEnd.pattern.setPattern("\(\\*/\)");
         multiLineCommentRuleEnd.format.setFontItalic(true);
         multiLineCommentRuleEnd.format.setForeground(Qt::darkGreen);
 
-        ruleSet.push_back(std::move(classRule));
-        ruleSet.push_back(std::move(namespaceRule));
-        ruleSet.push_back(std::move(commentRule));
-        ruleSet.push_back(std::move(multiLineCommentRuleStart));
-        ruleSet.push_back(std::move(multiLineCommentRuleEnd));
+        functionRule.pattern.setPattern("[\\w\\*\\&\\:]+\\s[\\w\\:\\>\\<\\+\\-\\=\\*]+\\([\\w\\s\\*\\&,\\:\\=]+\\)");
+        functionRule.format.setFontWeight(QFont::Bold);
+        functionRule.format.setForeground(Qt::red);
+
+        emptyFunctionRule.pattern.setPattern("[\\w\\*\\&\\:]+\\s[\\w\\:\\>\\<\\+\\-\\=\\*]+\\(\\)");
+        emptyFunctionRule.format.setFontWeight(QFont::Bold);
+        emptyFunctionRule.format.setForeground(Qt::red);
+
+        constructorRule.pattern.setPattern("[\\w\\:]+\\([\\w\\s\\*\\&,\\:\\=]+\\)");
+        constructorRule.format.setFontWeight(QFont::Bold);
+        constructorRule.format.setForeground(Qt::red);
+
+        defaultConstructorRule.pattern.setPattern("[\\w\\:]+\\(\\)");
+        defaultConstructorRule.format.setFontWeight(QFont::Bold);
+        defaultConstructorRule.format.setForeground(Qt::red);
+
+        destructorRule.pattern.setPattern("[\\w\\:\\~]+\\(\\)");
+        destructorRule.format.setFontWeight(QFont::Bold);
+        destructorRule.format.setForeground(Qt::red);
+
+        ruleSet.push_back(classRule);
+        ruleSet.push_back(namespaceRule);
+        ruleSet.push_back(commentRule);
+        ruleSet.push_back(multiLineCommentRuleStart);
+        ruleSet.push_back(multiLineCommentRuleEnd);
+        ruleSet.push_back(functionRule);
+        ruleSet.push_back(emptyFunctionRule);
+        ruleSet.push_back(constructorRule);
+        ruleSet.push_back(defaultConstructorRule);
+        ruleSet.push_back(destructorRule);
     }
     void CppHighlighter::highlightBlock(const QString& text)
     {
@@ -51,7 +71,7 @@ namespace Syntax
         Rule commentRule;
         for(Rule& rule: ruleSet)
         {
-            if(rule.pattern.pattern()=="\(\\*/\)" || rule.pattern.pattern()=="\(/\\*\)")
+            if(rule.pattern.pattern()==multiLineCommentRuleEnd.pattern.pattern() || rule.pattern.pattern()==multiLineCommentRuleStart.pattern.pattern())
             {
                 commentRule=rule;
                     break;
@@ -68,19 +88,53 @@ namespace Syntax
             {
                 noMatches=false;
                 QRegularExpressionMatch match=itr.next();
-                if(rule.pattern.pattern()=="\(/\\*\)" || (previousBlockState()==1 && rule.pattern.pattern()!="\(\\*/\)"))
+                if(rule.pattern.pattern()==multiLineCommentRuleStart.pattern.pattern() || (previousBlockState()==1 && rule.pattern.pattern()!=multiLineCommentRuleEnd.pattern.pattern()))
                 {
                     setCurrentBlockState(1);
                     setFormat(0, text.length(), commentRule.format);
                     commentEntered=true;
                     break;
                 }
-                else if(rule.pattern.pattern()=="\(\\*/\)")
+                else if(rule.pattern.pattern()==multiLineCommentRuleEnd.pattern.pattern())
                 {
                     setCurrentBlockState(0);
                     setFormat(0, text.length(), commentRule.format);
                     commentExited=true;
                     break;
+                }
+                else if(rule.pattern.pattern()==functionRule.pattern.pattern() || rule.pattern.pattern()==emptyFunctionRule.pattern.pattern())
+                {
+                    if(currentBlockState()==2) continue;
+                    int spacePos=-1, openBracketPos=-1;
+                    for(int i=match.capturedStart(); i<text.length(); i++)
+                    {
+                        if(text[i]==QChar::Space) spacePos=i;
+                        else if(text[i]==QChar::fromLatin1('(')) openBracketPos=i;
+                        if(spacePos!=-1 && openBracketPos!=-1) break;
+                    }
+                    setFormat(spacePos+1, openBracketPos-spacePos-1, rule.format);
+                    setCurrentBlockState(2);
+                    continue;
+                }
+                else if(rule.pattern.pattern()==constructorRule.pattern.pattern() || rule.pattern.pattern()==defaultConstructorRule.pattern.pattern() || rule.pattern.pattern()==destructorRule.pattern.pattern())
+                {
+                    if(currentBlockState()==2) continue;
+                    else
+                    {
+
+                        int openBracketPos=-1;
+                        for(int i=match.capturedStart(); i<text.length(); i++)
+                        {
+                            if(text[i]==QChar::fromLatin1('('))
+                                {
+                                    openBracketPos=i;
+                                    break;
+                                }
+                        }
+                        setFormat(match.capturedStart(), openBracketPos-1, rule.format);
+                        setCurrentBlockState(2);
+                        continue;
+                    }
                 }
                 setFormat(match.capturedStart(), match.capturedLength(), rule.format);
 
