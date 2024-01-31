@@ -62,6 +62,13 @@ namespace Syntax
         ruleSet.push_back(defaultConstructorRule);
         ruleSet.push_back(destructorRule);
     }
+
+
+    void CppHighlighter::loadFromFile(const std::string& filename)
+    {
+
+    }
+
     void CppHighlighter::highlightBlock(const QString& text)
     {
         std::cout<<"processed line:"<<std::endl;
