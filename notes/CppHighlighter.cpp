@@ -1,6 +1,7 @@
 #include "CppHighlighter.h"
 #include <iostream>
 #include "mainwindow.h"
+#include <QXmlStreamReader>
 
 namespace Syntax
 {
@@ -64,9 +65,52 @@ namespace Syntax
     }
 
 
-    void CppHighlighter::loadFromFile(const std::string& filename)
+    void CppHighlighter::loadFromFile(const QString& filename)
     {
+        //std::cout<<"reading from: ";
+        //Ui::qStringOut(filename);
+        File::File configFile{filename};
+        QString content=configFile.read();
+        //std::cout<<"content: "<<std::endl;
+        //Ui::qStringOut(content);
+        QXmlStreamReader xml{content};
 
+        while(!xml.atEnd())
+        {
+            xml.readNext();
+            if(xml.isStartDocument()) continue;
+            if(xml.isStartElement())
+            {
+                if(xml.name().toString()=="rule")
+                {
+                    Rule rule;
+                    //Ui::qStringOut(xml.attributes().value("name").toString());
+                    xml.readNext();
+                    bool patternRead=false;
+                    bool formatRead=false;
+                    while(!patternRead || !formatRead)
+                    {
+                        //bool oldPattern=patternRead;
+                        //bool oldFormat=formatRead;
+                        if(xml.name().toString()=="pattern")
+                        {
+                            rule.pattern.setPattern(xml.attributes().value("regexp").toString());
+                            //Ui::qStringOut(xml.attributes().value("regexp").toString());
+                            patternRead=true;
+                        }
+                        if(xml.name().toString()=="format")
+                        {
+                            rule.format.setFontWeight(xml.attributes().value("weight"))
+                            //Ui::qStringOut(xml.attributes().value("weight").toString());
+                            //Ui::qStringOut(xml.attributes().value("foreground").toString());
+                            //Ui::qStringOut(xml.attributes().value("fontStyle").toString());
+                            formatRead=true;
+                        }
+                        xml.readNext();
+                    }
+                }
+            }
+        }
     }
 
     void CppHighlighter::highlightBlock(const QString& text)

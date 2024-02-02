@@ -15,6 +15,7 @@ QString File::output(std::ostream& stream)
     QString File::read()
     {
         QString content;
+        //if(!this->exists()) std::cout<<("Error. File with this filename does not exist");
         this->open(QIODeviceBase::ReadOnly);
 
 

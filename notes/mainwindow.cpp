@@ -38,6 +38,7 @@ void MainWindow::open()
         if(QUrl::fromLocalFile(filename).fileName().endsWith(".cpp") || QUrl::fromLocalFile(filename).fileName().endsWith(".h"))
         {
             highlighter=new Syntax::CppHighlighter(qte->document());
+
             file->highlighter=highlighter;
         }
         ui->FileTabs->addTab(qte, QUrl::fromLocalFile(filename).fileName());

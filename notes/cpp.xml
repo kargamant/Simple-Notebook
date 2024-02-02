@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
 	<rule name="classRule">
-		<pattern regexp="class"/>
-		<format weight=100 foreground="002EFF" fontStyle=""/>
+		<pattern regexp="class"></pattern>
+                <format weight="100" foreground="002EFF" fontStyle=""></format>
 	</rule>
 	
 	<rule name="namespaceRule">
 		<pattern regexp="namespace"/>
-		<format weight=100 foreground="002EFF" fontStyle=""/>
+                <format weight="100" foreground="002EFF" fontStyle=""/>
 	</rule>
 	<rule name="commentRule">
 		<pattern regexp="//.*+"/>
-		<format weight=50 foreground="20E800" fontStyle="italic"/>
+                <format weight="50" foreground="20E800" fontStyle="italic"/>
 	</rule>
 	
 	<rule name="multiLineCommentRuleStart">
 		<pattern regexp="\(/\\*\)"/>
-		<format weight=50 foreground="20E800" fontStyle="italic"/>
+                <format weight="50" foreground="20E800" fontStyle="italic"/>
 	</rule>
 	<rule name="multiLineCommentRuleEnd">
 		<pattern regexp="\(\\*/\)"/>
-		<format weight=50 foreground="20E800" fontStyle="italic"/>
+                <format weight="50" foreground="20E800" fontStyle="italic"/>
 	</rule>
 	<rule name="functionRule">
-		<pattern regexp="[\\w\\*\\&\\:]+\\s[\\w\\:\\>\\<\\+\\-\\=\\*]+\\([\\w\\s\\*\\&,\\:\\=]+\\)"/>
-		<format weight=100 foreground="F30000" fontStyle=""/>
+		<pattern regexp="[\\w\\*\\&amp;\\:]+\\s[\\w\\:\\&gt;\\&lt;\\+\\-\\=\\*]+\\([\\w\\s\\*\\&amp;,\\:\\=]+\\)"/>
+                <format weight="100" foreground="F30000" fontStyle=""/>
 	</rule>
 	<rule name="emptyFunctionRule">
-		<pattern regexp="[\\w\\*\\&\\:]+\\s[\\w\\:\\>\\<\\+\\-\\=\\*]+\\(\\)"/>
-		<format weight=100 foreground="F30000" fontStyle=""/>
+		<pattern regexp="[\\w\\*\\&amp;\\:]+\\s[\\w\\:\\&gt;\\&lt;\\+\\-\\=\\*]+\\(\\)"/>
+                <format weight="100" foreground="F30000" fontStyle=""/>
 	</rule>
 	<rule name="constructorRule">
-		<pattern regexp="[\\w\\:]+\\([\\w\\s\\*\\&,\\:\\=]+\\)"/>
-		<format weight=100 foreground="F30000" fontStyle=""/>
-	</rule>
+		<pattern regexp="[\\w\\:]+\\([\\w\\s\\*\\&amp;,\\:\\=]+\\)"/>
+                <format weight="100" foreground="F30000" fontStyle=""/>
+        </rule>
 	<rule name="defaultConstructorRule">
 		<pattern regexp="[\\w\\:]+\\(\\)"/>
-		<format weight=100 foreground="F30000" fontStyle=""/>
+                <format weight="100" foreground="F30000" fontStyle=""/>
 	</rule>
 	<rule name="destructorRule">
 		<pattern regexp="[\\w\\:\\~]+\\(\\)"/>
-		<format weight=100 foreground="F30000" fontStyle=""/>
+                <format weight="100" foreground="F30000" fontStyle=""/>
 	</rule>
 </settings>
