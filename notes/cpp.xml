@@ -2,44 +2,44 @@
 <settings>
 	<rule name="classRule">
 		<pattern regexp="class"></pattern>
-                <format weight="100" foreground="blue" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"></format>
+                <format foreground="blue" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"></format>
 	</rule>
 	
 	<rule name="namespaceRule">
 		<pattern regexp="namespace"/>
-                <format weight="100" foreground="blue" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="blue" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	<rule name="commentRule">
 		<pattern regexp="//.*+"/>
-                <format weight="50" foreground="darkGreen" fontStyle="Segoe UI,9,-1,5,400,1,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="darkGreen" fontStyle="Segoe UI,9,-1,5,400,1,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	
 	<rule name="multiLineCommentRuleStart">
 		<pattern regexp="(/\*)"/>
-                <format weight="50" foreground="darkGreen" fontStyle="Segoe UI,9,-1,5,400,1,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="darkGreen" fontStyle="Segoe UI,9,-1,5,400,1,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	<rule name="multiLineCommentRuleEnd">
 		<pattern regexp="(\*/)"/>
-                <format weight="50" foreground="darkGreen" fontStyle="Segoe UI,9,-1,5,400,1,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="darkGreen" fontStyle="Segoe UI,9,-1,5,400,1,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	<rule name="functionRule">
 		<pattern regexp="[\w\*\&amp;\:]+\s[\w\:\&gt;\&lt;\+\-\=\*]+\([\w\s\*\&amp;,\:\=]+\)"/>
-                <format weight="100" foreground="red" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="red" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	<rule name="emptyFunctionRule">
 		<pattern regexp="[\w\*\&amp;\:]+\s[\w\:\&gt;\&lt;\+\-\=\*]+\(\)"/>
-                <format weight="100" foreground="red" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="red" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	<rule name="constructorRule">
 		<pattern regexp="[\w\:]+\([\w\s\*\&amp;,\:\=]+\)"/>
-                <format weight="700" foreground="magenta" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="magenta" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
         </rule>
 	<rule name="defaultConstructorRule">
 		<pattern regexp="[\w\:]+\(\)"/>
-                <format weight="700" foreground="magenta" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="magenta" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 	<rule name="destructorRule">
 		<pattern regexp="[\w\:\~]+\(\)"/>
-                <format weight="700" foreground="magenta" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
+                <format foreground="magenta" fontStyle="Segoe UI,9,-1,5,700,0,0,0,0,0,0,0,0,0,0,1"/>
 	</rule>
 </settings>

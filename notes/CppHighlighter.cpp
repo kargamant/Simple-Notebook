@@ -65,12 +65,8 @@ namespace Syntax
 
     void CppHighlighter::loadFromFile(const QString& filename)
     {
-        std::cout<<"reading from: ";
-        Ui::qStringOut(filename);
         File::File configFile{filename};
         QString content=configFile.read();
-        //std::cout<<"content: "<<std::endl;
-        //Ui::qStringOut(content);
         QXmlStreamReader xml{content};
 
         while(!xml.atEnd())
@@ -81,47 +77,27 @@ namespace Syntax
             {
                 if(xml.name().toString()=="rule")
                 {
-                    //Rule rule;
                     Rule* rule=stringToRule(xml.attributes().value("name").toString());
                     rule->name=xml.attributes().value("name").toString();
-                    Ui::qStringOut(xml.attributes().value("name").toString());
                     xml.readNext();
                     bool patternRead=false;
                     bool formatRead=false;
                     while(!patternRead || !formatRead)
                     {
-                        //bool oldPattern=patternRead;
-                        //bool oldFormat=formatRead;
                         if(xml.name().toString()=="pattern" && !patternRead)
                         {
-                            QString* pattern=new QString();
-                            QString xmlPatternData=xml.attributes().value("regexp").toString();
-                            for(QChar* qch=xmlPatternData.data(); qch-xmlPatternData.data()<xmlPatternData.length(); ++qch)
-                            {
-                                pattern->append(qch->toLatin1());
-                            }
-
-                            rule->pattern.setPattern(*pattern);
-                            Ui::qStringOut(xml.attributes().value("regexp").toString());
+                            rule->pattern.setPattern(xml.attributes().value("regexp").toString());
                             patternRead=true;
                         }
                         if(xml.name().toString()=="format" && !formatRead)
                         {
                             rule->format.setFont(stringToFont(xml.attributes().value("fontStyle").toString()));
-                            rule->format.setFontWeight(xml.attributes().value("weight").toString().toInt());
                             rule->format.setForeground(QColor::fromString(xml.attributes().value("foreground")));
-                            //rule.format.setFont(QFont::)
-                            Ui::qStringOut(xml.attributes().value("weight").toString());
-                            Ui::qStringOut(xml.attributes().value("foreground").toString());
-                            Ui::qStringOut(xml.attributes().value("fontStyle").toString());
                             formatRead=true;
                         }
                         xml.readNext();
                     }
                     ruleSet.push_back(*rule);
-                    std::cout<<"debug rule: "<<std::endl;
-                    rule->debugRule();
-                    //Ui::qStringOut(multiLineCommentRuleStart.pattern.pattern());
                 }
             }
         }
@@ -167,19 +143,6 @@ namespace Syntax
 
     void CppHighlighter::highlightBlock(const QString& text)
     {
-        //std::cout<<"processed line:"<<std::endl;
-        //Ui::qStringOut(text);
-
-        /*Rule commentRule;
-        for(Rule& rule: ruleSet)
-        {
-            if(rule.pattern.pattern()==multiLineCommentRuleEnd.pattern.pattern() || rule.pattern.pattern()==multiLineCommentRuleStart.pattern.pattern())
-            {
-                commentRule=rule;
-                    break;
-            }
-        }*/
-        std::cout<<"highlight block:"<<std::endl;
         bool noMatches=true;
         for(Rule& rule: ruleSet)
         {
@@ -193,7 +156,6 @@ namespace Syntax
                 QRegularExpressionMatch match=itr.next();
                 if(rule.name==multiLineCommentRuleStart.name || (previousBlockState()==1 && rule.name!=multiLineCommentRuleEnd.name))
                 {
-                    std::cout<<"entered"<<std::endl;
                     setCurrentBlockState(1);
                     setFormat(0, text.length(), commentRule.format);
                     commentEntered=true;
@@ -201,13 +163,12 @@ namespace Syntax
                 }
                 else if(rule.name==multiLineCommentRuleEnd.name)
                 {
-                    std::cout<<"exited"<<std::endl;
                     setCurrentBlockState(0);
                     setFormat(0, text.length(), commentRule.format);
                     commentExited=true;
                     break;
                 }
-                else if(rule.pattern.pattern()==functionRule.pattern.pattern() || rule.pattern.pattern()==emptyFunctionRule.pattern.pattern())
+                else if(rule.name==functionRule.name || rule.name==emptyFunctionRule.name)
                 {
                     if(currentBlockState()==2) continue;
                     int spacePos=-1, openBracketPos=-1;
@@ -254,6 +215,5 @@ namespace Syntax
                 setFormat(0, text.length(), commentRule.format);
             }
         }
-        //std::cout<<"current block state: "<<currentBlockState()<<std::endl;
     }
 }
