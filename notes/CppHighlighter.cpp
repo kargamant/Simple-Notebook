@@ -98,7 +98,7 @@ namespace Syntax
                             QString xmlPatternData=xml.attributes().value("regexp").toString();
                             for(QChar* qch=xmlPatternData.data(); qch-xmlPatternData.data()<xmlPatternData.length(); ++qch)
                             {
-                                pattern->append(*qch);
+                                pattern->append(qch->toLatin1());
                             }
 
                             rule->pattern.setPattern(*pattern);
@@ -121,7 +121,7 @@ namespace Syntax
                     ruleSet.push_back(*rule);
                     std::cout<<"debug rule: "<<std::endl;
                     rule->debugRule();
-                    //std::cout<<"Empty: "<<rule->pattern.pattern().isEmpty()<<std::endl;
+                    //Ui::qStringOut(multiLineCommentRuleStart.pattern.pattern());
                 }
             }
         }
@@ -170,8 +170,7 @@ namespace Syntax
         //std::cout<<"processed line:"<<std::endl;
         //Ui::qStringOut(text);
 
-
-        Rule commentRule;
+        /*Rule commentRule;
         for(Rule& rule: ruleSet)
         {
             if(rule.pattern.pattern()==multiLineCommentRuleEnd.pattern.pattern() || rule.pattern.pattern()==multiLineCommentRuleStart.pattern.pattern())
@@ -179,11 +178,12 @@ namespace Syntax
                 commentRule=rule;
                     break;
             }
-        }
-
+        }*/
+        std::cout<<"highlight block:"<<std::endl;
         bool noMatches=true;
         for(Rule& rule: ruleSet)
         {
+            rule.debugRule();
             bool commentEntered=false;
             bool commentExited=false;
             QRegularExpressionMatchIterator itr=rule.pattern.globalMatch(text);
@@ -191,15 +191,17 @@ namespace Syntax
             {
                 noMatches=false;
                 QRegularExpressionMatch match=itr.next();
-                if(rule.pattern.pattern()==multiLineCommentRuleStart.pattern.pattern() || (previousBlockState()==1 && rule.pattern.pattern()!=multiLineCommentRuleEnd.pattern.pattern()))
+                if(rule.name==multiLineCommentRuleStart.name || (previousBlockState()==1 && rule.name!=multiLineCommentRuleEnd.name))
                 {
+                    std::cout<<"entered"<<std::endl;
                     setCurrentBlockState(1);
                     setFormat(0, text.length(), commentRule.format);
                     commentEntered=true;
                     break;
                 }
-                else if(rule.pattern.pattern()==multiLineCommentRuleEnd.pattern.pattern())
+                else if(rule.name==multiLineCommentRuleEnd.name)
                 {
+                    std::cout<<"exited"<<std::endl;
                     setCurrentBlockState(0);
                     setFormat(0, text.length(), commentRule.format);
                     commentExited=true;
