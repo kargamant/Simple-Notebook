@@ -23,7 +23,7 @@ void MainWindow::open()
         QString filename=Ui::binaryToQString(itr);
         File::File* file=new File::File{filename};
         //debug output
-        file->output();
+        //file->output();
 
         //perhaps uneffective way to read file, but gonna try
         QTextDocument* doc=new QTextDocument();
@@ -34,10 +34,9 @@ void MainWindow::open()
         qte->setDocument(doc);
 
         //highlighting
-        QSyntaxHighlighter* highlighter;
         if(QUrl::fromLocalFile(filename).fileName().endsWith(".cpp") || QUrl::fromLocalFile(filename).fileName().endsWith(".h"))
         {
-            highlighter=new Syntax::CppHighlighter(qte->document());
+            QSyntaxHighlighter* highlighter=new Syntax::CppHighlighter(qte->document(), "..\\notes\\cpp.xml");
 
             file->highlighter=highlighter;
         }

@@ -18,11 +18,17 @@ namespace Syntax
         namespaceRule.format.setFontWeight(QFont::Bold);
         namespaceRule.format.setForeground(Qt::blue);
 
+        std::cout<<"namespace rule format: ";
+        Ui::qStringOut(namespaceRule.format.font().toString());
+
         //comments
         commentRule.pattern.setPattern("//.*+");
         commentRule.format.setFontItalic(true);
         commentRule.format.setForeground(Qt::darkGreen);
 
+        //debug
+        std::cout<<"comment rule format: ";
+        Ui::qStringOut(commentRule.format.font().toString());
 
         multiLineCommentRuleStart.pattern.setPattern("\(/\\*\)");
         multiLineCommentRuleStart.format.setFontItalic(true);
@@ -51,24 +57,16 @@ namespace Syntax
         destructorRule.pattern.setPattern("[\\w\\:\\~]+\\(\\)");
         destructorRule.format.setFontWeight(QFont::Bold);
         destructorRule.format.setForeground(Qt::red);
+        std::cout<<"destructor rule format: ";
+        Ui::qStringOut(destructorRule.format.font().toString());
 
-        ruleSet.push_back(classRule);
-        ruleSet.push_back(namespaceRule);
-        ruleSet.push_back(commentRule);
-        ruleSet.push_back(multiLineCommentRuleStart);
-        ruleSet.push_back(multiLineCommentRuleEnd);
-        ruleSet.push_back(functionRule);
-        ruleSet.push_back(emptyFunctionRule);
-        ruleSet.push_back(constructorRule);
-        ruleSet.push_back(defaultConstructorRule);
-        ruleSet.push_back(destructorRule);
     }
 
 
     void CppHighlighter::loadFromFile(const QString& filename)
     {
-        //std::cout<<"reading from: ";
-        //Ui::qStringOut(filename);
+        std::cout<<"reading from: ";
+        Ui::qStringOut(filename);
         File::File configFile{filename};
         QString content=configFile.read();
         //std::cout<<"content: "<<std::endl;
@@ -83,8 +81,10 @@ namespace Syntax
             {
                 if(xml.name().toString()=="rule")
                 {
-                    Rule rule;
-                    //Ui::qStringOut(xml.attributes().value("name").toString());
+                    //Rule rule;
+                    Rule* rule=stringToRule(xml.attributes().value("name").toString());
+                    rule->name=xml.attributes().value("name").toString();
+                    Ui::qStringOut(xml.attributes().value("name").toString());
                     xml.readNext();
                     bool patternRead=false;
                     bool formatRead=false;
@@ -92,31 +92,83 @@ namespace Syntax
                     {
                         //bool oldPattern=patternRead;
                         //bool oldFormat=formatRead;
-                        if(xml.name().toString()=="pattern")
+                        if(xml.name().toString()=="pattern" && !patternRead)
                         {
-                            rule.pattern.setPattern(xml.attributes().value("regexp").toString());
-                            //Ui::qStringOut(xml.attributes().value("regexp").toString());
+                            QString* pattern=new QString();
+                            QString xmlPatternData=xml.attributes().value("regexp").toString();
+                            for(QChar* qch=xmlPatternData.data(); qch-xmlPatternData.data()<xmlPatternData.length(); ++qch)
+                            {
+                                pattern->append(*qch);
+                            }
+
+                            rule->pattern.setPattern(*pattern);
+                            Ui::qStringOut(xml.attributes().value("regexp").toString());
                             patternRead=true;
                         }
-                        if(xml.name().toString()=="format")
+                        if(xml.name().toString()=="format" && !formatRead)
                         {
-                            rule.format.setFontWeight(xml.attributes().value("weight"))
-                            //Ui::qStringOut(xml.attributes().value("weight").toString());
-                            //Ui::qStringOut(xml.attributes().value("foreground").toString());
-                            //Ui::qStringOut(xml.attributes().value("fontStyle").toString());
+                            rule->format.setFont(stringToFont(xml.attributes().value("fontStyle").toString()));
+                            rule->format.setFontWeight(xml.attributes().value("weight").toString().toInt());
+                            rule->format.setForeground(QColor::fromString(xml.attributes().value("foreground")));
+                            //rule.format.setFont(QFont::)
+                            Ui::qStringOut(xml.attributes().value("weight").toString());
+                            Ui::qStringOut(xml.attributes().value("foreground").toString());
+                            Ui::qStringOut(xml.attributes().value("fontStyle").toString());
                             formatRead=true;
                         }
                         xml.readNext();
                     }
+                    ruleSet.push_back(*rule);
+                    std::cout<<"debug rule: "<<std::endl;
+                    rule->debugRule();
+                    //std::cout<<"Empty: "<<rule->pattern.pattern().isEmpty()<<std::endl;
                 }
             }
         }
     }
 
+    QFont CppHighlighter::stringToFont(const QString& config)
+    {
+        QStringList params=config.split(u',');
+        QFont font;
+        font.setFamily(params[0]);
+        font.setPointSize(params[1].toInt());
+        font.setPixelSize(params[2].toInt());
+        font.setStyleHint(QFont::StyleHint(params[3].toInt()));
+        font.setWeight(QFont::Weight(params[4].toInt()));
+        font.setStyle(QFont::Style(params[5].toInt()));
+        font.setUnderline(params[6].toInt());
+        font.setStrikeOut(params[7].toInt());
+        font.setFixedPitch(params[8].toInt());
+        font.setOverline(params[9].toInt()); // "Always 0" mapped to "Overline" as there is no direct "Always 0" property
+        font.setCapitalization(QFont::Capitalization(params[10].toInt()));
+        font.setLetterSpacing(QFont::AbsoluteSpacing, params[11].toDouble());
+        font.setWordSpacing(params[12].toInt());
+        font.setStretch(params[13].toInt());
+        font.setStyleStrategy(QFont::StyleStrategy(params[14].toInt()));
+        font.setStyle(QFont::Style(params[15].toInt()));
+        return font;
+    }
+
+    Rule* CppHighlighter::stringToRule(const QString& ruleName)
+    {
+        if(ruleName=="classRule") return &classRule;
+        else if(ruleName=="namespaceRule") return &namespaceRule;
+        else if(ruleName=="commentRule") return &commentRule;
+        else if(ruleName=="multiLineCommentRuleStart") return &multiLineCommentRuleStart;
+        else if(ruleName=="multiLineCommentRuleEnd") return &multiLineCommentRuleEnd;
+        else if(ruleName=="functionRule") return &functionRule;
+        else if(ruleName=="emptyFunctionRule") return &emptyFunctionRule;
+        else if(ruleName=="constructorRule") return &constructorRule;
+        else if(ruleName=="defaultConstructorRule") return &defaultConstructorRule;
+        else if(ruleName=="destructorRule") return &destructorRule;
+        else throw std::invalid_argument("Error. No sush rule with given ruleName.");
+    }
+
     void CppHighlighter::highlightBlock(const QString& text)
     {
-        std::cout<<"processed line:"<<std::endl;
-        Ui::qStringOut(text);
+        //std::cout<<"processed line:"<<std::endl;
+        //Ui::qStringOut(text);
 
 
         Rule commentRule;
@@ -200,6 +252,6 @@ namespace Syntax
                 setFormat(0, text.length(), commentRule.format);
             }
         }
-        std::cout<<"current block state: "<<currentBlockState()<<std::endl;
+        //std::cout<<"current block state: "<<currentBlockState()<<std::endl;
     }
 }

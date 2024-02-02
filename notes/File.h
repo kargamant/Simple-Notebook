@@ -9,11 +9,11 @@ namespace File
     class File : public QFile
     {
     public:
-        QSyntaxHighlighter* highlighter;
+        QSyntaxHighlighter* highlighter=nullptr;
         File(const QString& filename) : QFile(filename) {}
         ~File()
         {
-            delete highlighter;
+            if(highlighter!=nullptr) delete highlighter;
         }
         //QString getFileName();
         QString output(std::ostream& stream=std::cout);
