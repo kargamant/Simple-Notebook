@@ -21,9 +21,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void open();
-
+    void newFile();
+    void saveFile();
 private:
     Ui::MainWindow *ui;
     std::vector<File::File*> files;
+    int lastCreatedTab=0;
 };
 #endif // MAINWINDOW_H

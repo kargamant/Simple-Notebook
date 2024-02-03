@@ -5,6 +5,7 @@
 #include <iostream>
 #include "File.h"
 #include "CppHighlighter.h"
+#include <fstream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::open);
+    connect(ui->newButton, &QPushButton::clicked, this, &MainWindow::newFile);
+    connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveFile);
 }
 
 void MainWindow::open()
@@ -42,6 +45,46 @@ void MainWindow::open()
         }
         ui->FileTabs->addTab(qte, QUrl::fromLocalFile(filename).fileName());
         this->files.push_back(file);
+    }
+}
+
+void MainWindow::newFile()
+{
+    //obeying the rule: One tab <=> one file.
+    //Tab cant exist without file, even empty or non created yet
+    File::File* file=new File::File("");
+    QTextDocument* doc=new QTextDocument();
+    QTextEdit* qte=new QTextEdit(this);
+    qte->setDocument(doc);
+    files.push_back(file);
+    QString tabName="noname";
+
+    if(lastCreatedTab!=0) tabName+=std::to_string(lastCreatedTab);
+    ui->FileTabs->addTab(qte, tabName);
+    lastCreatedTab++;
+
+    /*std::fstream file;
+    file.open("../noname.txt");
+    if(!file)
+    {
+        file.open("../noname.txt", std::ios::out);
+        file.close();
+    }
+    else
+    {
+        file.close();
+    }*/
+}
+
+
+void MainWindow::saveFile()
+{
+    int i=ui->FileTabs->currentIndex();
+    QWidget* curWidget=ui->FileTabs[i].currentWidget();
+    if(files[i]->fileName()!="") files[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+    else
+    {
+        //saveAsFile();
     }
 }
 

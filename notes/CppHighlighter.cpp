@@ -18,17 +18,12 @@ namespace Syntax
         namespaceRule.format.setFontWeight(QFont::Bold);
         namespaceRule.format.setForeground(Qt::blue);
 
-        std::cout<<"namespace rule format: ";
-        Ui::qStringOut(namespaceRule.format.font().toString());
 
         //comments
         commentRule.pattern.setPattern("//.*+");
         commentRule.format.setFontItalic(true);
         commentRule.format.setForeground(Qt::darkGreen);
 
-        //debug
-        std::cout<<"comment rule format: ";
-        Ui::qStringOut(commentRule.format.font().toString());
 
         multiLineCommentRuleStart.pattern.setPattern("\(/\\*\)");
         multiLineCommentRuleStart.format.setFontItalic(true);
@@ -38,6 +33,7 @@ namespace Syntax
         multiLineCommentRuleEnd.format.setFontItalic(true);
         multiLineCommentRuleEnd.format.setForeground(Qt::darkGreen);
 
+        //functions
         functionRule.pattern.setPattern("[\\w\\*\\&\\:]+\\s[\\w\\:\\>\\<\\+\\-\\=\\*]+\\([\\w\\s\\*\\&,\\:\\=]+\\)");
         functionRule.format.setFontWeight(QFont::Bold);
         functionRule.format.setForeground(Qt::red);
@@ -46,6 +42,7 @@ namespace Syntax
         emptyFunctionRule.format.setFontWeight(QFont::Bold);
         emptyFunctionRule.format.setForeground(Qt::red);
 
+        //member functions
         constructorRule.pattern.setPattern("[\\w\\:]+\\([\\w\\s\\*\\&,\\:\\=]+\\)");
         constructorRule.format.setFontWeight(QFont::Bold);
         constructorRule.format.setForeground(Qt::red);
@@ -57,8 +54,6 @@ namespace Syntax
         destructorRule.pattern.setPattern("[\\w\\:\\~]+\\(\\)");
         destructorRule.format.setFontWeight(QFont::Bold);
         destructorRule.format.setForeground(Qt::red);
-        std::cout<<"destructor rule format: ";
-        Ui::qStringOut(destructorRule.format.font().toString());
 
     }
 

@@ -1,5 +1,6 @@
 #include "File.h"
 #include "mainwindow.h"
+#include <fstream>
 
 namespace File
 {
@@ -28,5 +29,19 @@ QString File::output(std::ostream& stream)
         return content;
     }
 
+
+    void File::write(const QString& newContent)
+    {
+        std::ofstream file;
+        file.open(fileName().toStdString());
+        file<<newContent.toStdString();
+        file.close();
+    }
+    /*void File::save()
+    {
+        std::ofstream file;
+        file.open(fileName().toStdString());
+
+    }*/
 
 }
