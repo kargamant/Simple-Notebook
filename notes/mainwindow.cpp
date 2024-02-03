@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::open);
     connect(ui->newButton, &QPushButton::clicked, this, &MainWindow::newFile);
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveFile);
+    connect(ui->saveAsButton, &QPushButton::clicked, this, &MainWindow::saveAsFile);
 }
 
 void MainWindow::open()
@@ -80,12 +81,19 @@ void MainWindow::newFile()
 void MainWindow::saveFile()
 {
     int i=ui->FileTabs->currentIndex();
-    QWidget* curWidget=ui->FileTabs[i].currentWidget();
+    QWidget* curWidget=ui->FileTabs->currentWidget();
     if(files[i]->fileName()!="") files[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
     else
     {
-        //saveAsFile();
+        saveAsFile();
     }
+}
+
+void MainWindow::saveAsFile()
+{
+    int i=ui->FileTabs->currentIndex();
+    QWidget* curWidget=ui->FileTabs->currentWidget();
+    QFileDialog::saveFileContent(dynamic_cast<QTextEdit*>(curWidget)->toPlainText().toLatin1(), files[i]->fileName());
 }
 
 QString Ui::qStringOut(const QString& str, std::ostream& stream)

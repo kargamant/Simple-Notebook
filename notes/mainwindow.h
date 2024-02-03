@@ -23,6 +23,7 @@ public:
     void open();
     void newFile();
     void saveFile();
+    void saveAsFile();
 private:
     Ui::MainWindow *ui;
     std::vector<File::File*> files;
