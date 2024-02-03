@@ -7,6 +7,11 @@
 #include "CppHighlighter.h"
 #include <fstream>
 #include "FileTab.h"
+#include <QWindow>
+#include <QtQuick/qquickwindow.h>
+#include <QMessageBox>
+
+QString MainWindow::DEFAULT_PATH="D:\\qt_test_sources";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,27 +22,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->newButton, &QPushButton::clicked, this, &MainWindow::newFile);
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveFile);
     connect(ui->saveAsButton, &QPushButton::clicked, this, &MainWindow::saveAsFile);
+    connect(ui->closeButton, &QPushButton::clicked, this, &MainWindow::closeFile);
 }
 
 void MainWindow::open()
 {
-    QStringList files=QFileDialog::getOpenFileNames(this, "Choose a file", "C:\\Users\\Honor", "*.txt *.h *.cpp *.c *.py");
+    QStringList files=QFileDialog::getOpenFileNames(this, "Choose a file", DEFAULT_PATH, "*.txt *.h *.cpp *.c *.py");
     std::cout<<"chosen files:"<<std::endl;
     for(auto itr: files)
     {
         File::FileTab* ft=new File::FileTab(Ui::binaryToQString(itr), this);
-        /*QString filename=Ui::binaryToQString(itr);
-        File::File* file=new File::File{filename};
-        //debug output
-        //file->output();
-
-        //perhaps uneffective way to read file, but gonna try
-        QTextDocument* doc=new QTextDocument();
-        QString content=file->read();
-        doc->setPlainText(content);
-
-        QTextEdit* qte=new QTextEdit(this);
-        qte->setDocument(doc);*/
 
         //highlighting
         if(QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".cpp") || QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".h"))
@@ -53,13 +47,6 @@ void MainWindow::open()
 
 void MainWindow::newFile()
 {
-    //obeying the rule: One tab <=> one file.
-    //Tab cant exist without file, even empty or non created yet
-    /*File::File* file=new File::File("");
-    QTextDocument* doc=new QTextDocument();
-    QTextEdit* qte=new QTextEdit(this);
-    qte->setDocument(doc);
-    files.push_back(file);*/
     File::FileTab* ft=new File::FileTab("", this);
     fileTabs.push_back(ft);
     QString tabName="noname";
@@ -68,44 +55,51 @@ void MainWindow::newFile()
     ui->FileTabs->addTab(dynamic_cast<QTextEdit*>(ft), tabName);
     lastCreatedTab++;
 
-    /*std::fstream file;
-    file.open("../noname.txt");
-    if(!file)
-    {
-        file.open("../noname.txt", std::ios::out);
-        file.close();
-    }
-    else
-    {
-        file.close();
-    }*/
 }
 
 
 void MainWindow::saveFile()
 {
-    int i=ui->FileTabs->currentIndex();
-    QWidget* curWidget=ui->FileTabs->currentWidget();
-    if(fileTabs[i]->fileName()!="") fileTabs[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
-    else
+    if(!check("Error. Nothing to save.", fileTabs.empty()))
     {
-        saveAsFile();
+        int i=ui->FileTabs->currentIndex();
+        QWidget* curWidget=ui->FileTabs->currentWidget();
+        if(fileTabs[i]->fileName()!="") fileTabs[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+        else
+        {
+            saveAsFile();
+        }
     }
 }
 
 void MainWindow::saveAsFile()
 {
-    int i=ui->FileTabs->currentIndex();
-    QWidget* curWidget=ui->FileTabs->currentWidget();
-    QString path=QFileDialog::getSaveFileName(this, "choose directory", "d:\\");
-    File::File destination{path};
-    destination.write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+    if(!check("Error. Nothing to save as", fileTabs.empty()))
+    {
+        QWidget* curWidget=ui->FileTabs->currentWidget();
+        QString path=QFileDialog::getSaveFileName(this, "choose directory", DEFAULT_PATH);
+        File::File destination{path};
+        destination.write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+    }
+
 
     /*delete
     ui->FileTabs->removeTab(i);
 
 
     ui->FileTabs->insertTab()*/
+}
+
+
+int MainWindow::closeFile()
+{
+    if(!check("Error. Cant close tab. No tabs are opened.", fileTabs.empty()))
+    {
+        int i=ui->FileTabs->currentIndex();
+        fileTabs.erase(fileTabs.begin()+i);
+        ui->FileTabs->removeTab(i);
+        return i;
+    }
 }
 
 QString Ui::qStringOut(const QString& str, std::ostream& stream)
@@ -128,6 +122,22 @@ QString Ui::binaryToQString(QString& str)
         latin_str+=qch->toLatin1();
     }
     return latin_str;
+}
+
+
+bool MainWindow::check(const QString& msg, bool condition)
+{
+    QMessageBox* box=nullptr;
+    if(condition)
+    {
+        box=new QMessageBox();
+        box->addButton("ok", QMessageBox::DestructiveRole);
+        box->setAttribute(Qt::WA_DeleteOnClose);
+        box->setText(msg);
+        box->show();
+
+    }
+    return box!=nullptr;
 }
 
 MainWindow::~MainWindow()

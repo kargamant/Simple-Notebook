@@ -18,12 +18,15 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    static QString DEFAULT_PATH;
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void open();
     void newFile();
     void saveFile();
     void saveAsFile();
+    int closeFile();
+    bool check(const QString& msg, bool condition);
 private:
     Ui::MainWindow *ui;
     std::vector<File::FileTab*> fileTabs;

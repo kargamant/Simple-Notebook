@@ -7,5 +7,13 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.show();
-    return a.exec();
+    try
+    {
+        a.exec();
+    }
+    catch(std::invalid_argument error)
+    {
+        std::cout<<error.what()<<std::endl;
+    }
+    return 0;
 }
