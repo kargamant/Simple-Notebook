@@ -6,6 +6,7 @@
 #include "File.h"
 #include "CppHighlighter.h"
 #include <fstream>
+#include "FileTab.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,7 +25,8 @@ void MainWindow::open()
     std::cout<<"chosen files:"<<std::endl;
     for(auto itr: files)
     {
-        QString filename=Ui::binaryToQString(itr);
+        File::FileTab* ft=new File::FileTab(Ui::binaryToQString(itr), this);
+        /*QString filename=Ui::binaryToQString(itr);
         File::File* file=new File::File{filename};
         //debug output
         //file->output();
@@ -35,17 +37,17 @@ void MainWindow::open()
         doc->setPlainText(content);
 
         QTextEdit* qte=new QTextEdit(this);
-        qte->setDocument(doc);
+        qte->setDocument(doc);*/
 
         //highlighting
-        if(QUrl::fromLocalFile(filename).fileName().endsWith(".cpp") || QUrl::fromLocalFile(filename).fileName().endsWith(".h"))
+        if(QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".cpp") || QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".h"))
         {
-            QSyntaxHighlighter* highlighter=new Syntax::CppHighlighter(qte->document(), "..\\notes\\cpp.xml");
+            QSyntaxHighlighter* highlighter=new Syntax::CppHighlighter(dynamic_cast<QTextEdit*>(ft)->document(), "..\\notes\\cpp.xml");
 
-            file->highlighter=highlighter;
+            dynamic_cast<File::File*>(ft)->highlighter=highlighter;
         }
-        ui->FileTabs->addTab(qte, QUrl::fromLocalFile(filename).fileName());
-        this->files.push_back(file);
+        ui->FileTabs->addTab(dynamic_cast<QTextEdit*>(ft), QUrl::fromLocalFile(ft->fileName()).fileName());
+        this->fileTabs.push_back(ft);
     }
 }
 
@@ -53,15 +55,17 @@ void MainWindow::newFile()
 {
     //obeying the rule: One tab <=> one file.
     //Tab cant exist without file, even empty or non created yet
-    File::File* file=new File::File("");
+    /*File::File* file=new File::File("");
     QTextDocument* doc=new QTextDocument();
     QTextEdit* qte=new QTextEdit(this);
     qte->setDocument(doc);
-    files.push_back(file);
+    files.push_back(file);*/
+    File::FileTab* ft=new File::FileTab("", this);
+    fileTabs.push_back(ft);
     QString tabName="noname";
 
     if(lastCreatedTab!=0) tabName+=std::to_string(lastCreatedTab);
-    ui->FileTabs->addTab(qte, tabName);
+    ui->FileTabs->addTab(dynamic_cast<QTextEdit*>(ft), tabName);
     lastCreatedTab++;
 
     /*std::fstream file;
@@ -82,7 +86,7 @@ void MainWindow::saveFile()
 {
     int i=ui->FileTabs->currentIndex();
     QWidget* curWidget=ui->FileTabs->currentWidget();
-    if(files[i]->fileName()!="") files[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+    if(fileTabs[i]->fileName()!="") fileTabs[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
     else
     {
         saveAsFile();
@@ -93,7 +97,15 @@ void MainWindow::saveAsFile()
 {
     int i=ui->FileTabs->currentIndex();
     QWidget* curWidget=ui->FileTabs->currentWidget();
-    QFileDialog::saveFileContent(dynamic_cast<QTextEdit*>(curWidget)->toPlainText().toLatin1(), files[i]->fileName());
+    QString path=QFileDialog::getSaveFileName(this, "choose directory", "d:\\");
+    File::File destination{path};
+    destination.write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+
+    /*delete
+    ui->FileTabs->removeTab(i);
+
+
+    ui->FileTabs->insertTab()*/
 }
 
 QString Ui::qStringOut(const QString& str, std::ostream& stream)
@@ -120,11 +132,12 @@ QString Ui::binaryToQString(QString& str)
 
 MainWindow::~MainWindow()
 {
-    for(int i=0; i<ui->FileTabs->count(); i++)
+    for(int i=0; i<fileTabs.size(); i++)
     {
-        delete files[i];
-        delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
-        delete ui->FileTabs->widget(i);
+        delete fileTabs[i];
+        //delete files[i];
+        //delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
+        //delete ui->FileTabs->widget(i);
     }
-    delete ui;
+    //delete ui;
 }

@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <iostream>
-#include "File.h"
+#include "FileTab.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,7 +26,7 @@ public:
     void saveAsFile();
 private:
     Ui::MainWindow *ui;
-    std::vector<File::File*> files;
+    std::vector<File::FileTab*> fileTabs;
     int lastCreatedTab=0;
 };
 #endif // MAINWINDOW_H
