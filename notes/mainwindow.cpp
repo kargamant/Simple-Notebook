@@ -10,6 +10,7 @@
 #include <QWindow>
 #include <QtQuick/qquickwindow.h>
 #include <QMessageBox>
+#include <QTableWidget>
 
 QString MainWindow::DEFAULT_PATH="D:\\qt_test_sources";
 
@@ -94,7 +95,8 @@ void MainWindow::saveAsFileByIndex(int i)
         {
             File::File destination{path};
             destination.write(dynamic_cast<QTextEdit*>(iWidget)->toPlainText());
-            closeFileByIndex(i);
+            fileTabs.erase(fileTabs.begin()+i);
+            ui->FileTabs->removeTab(i);
             File::FileTab* ft=new File::FileTab(destination.fileName(), this);
             fileTabs.insert(fileTabs.begin()+i, ft);
             ui->FileTabs->insertTab(i, dynamic_cast<QWidget*>(ft), QUrl::fromLocalFile(ft->fileName()).fileName());
@@ -107,7 +109,7 @@ int MainWindow::closeFileByIndex(int i)
 {
     if(!check("Error. Cant close tab. No tabs are opened.", fileTabs.empty()) && !check("Error. No tab with this index", i>=fileTabs.size()))
     {
-        if(suggest("File was modified. Would you like to save it before closing?", fileTabs[i]->document()->isModified()))
+        if(suggest("File "+ui->FileTabs->tabText(i)+" was modified. Would you like to save it before closing?", fileTabs[i]->document()->isModified()))
         {
             saveFileByIndex(i);
         }
@@ -149,10 +151,26 @@ void MainWindow::saveAllFiles()
 void MainWindow::exitApp()
 {
     if(fileTabs.empty()) close();
-    /*else
+    else
     {
-
-    }*/
+        std::pair<bool, QTableWidget*> answer=exitSuggest("Some files were modified, but not saved. Would you like to save them?");
+        if(!answer.first)
+        {
+            close();
+        }
+        else
+        {
+            QTableWidget* table=answer.second;
+            for(int i=0; i<table->rowCount(); i++)
+            {
+                for(int j=0; j<table->columnCount(); j++)
+                {
+                    std::cout<<"item "<<i<<" "<<j<<": ";
+                    Ui::qStringOut(table->item(i, j)->text());
+                }
+            }
+        }
+    }
 }
 
 bool MainWindow::suggest(const QString& msg, bool condition)
@@ -169,6 +187,87 @@ bool MainWindow::suggest(const QString& msg, bool condition)
         return !box->exec();
     }
     return false;
+}
+
+std::pair<bool, QTableWidget*> MainWindow::exitSuggest(const QString& msg)
+{
+    QTableWidget* table=formTable(&MainWindow::isModified);
+    if(table==nullptr) return {false, nullptr};
+    QDialog* dialogue=new QDialog();
+    dialogue->setParent(table);
+
+    QPushButton* yes=new QPushButton(table);
+    QPushButton* no=new QPushButton(table);
+
+    yes->setText("yes");
+    no->setText("no");
+
+    QRect itemRect=table->visualItemRect(table->item(0, 0));
+    yes->setGeometry(17, (table->rowCount()+1)*itemRect.height(), itemRect.width(), itemRect.height());
+    no->setGeometry((table->columnCount()-1)*itemRect.width()+17, (table->rowCount()+1)*itemRect.height(), itemRect.width(), itemRect.height());
+
+    connect(yes, &QPushButton::clicked, dialogue, &QDialog::accept);
+    connect(no, &QPushButton::clicked, dialogue, &QDialog::reject);
+
+    //dialogue->setAttribute(Qt::WA_DeleteOnClose);
+    //yes->setAttribute(Qt::WA_DeleteOnClose);
+    //no->setAttribute(Qt::WA_DeleteOnClose);
+    table->show();
+
+    bool result=dialogue->exec();
+    //dialogue->close();
+    //yes->close();
+    //no->close();
+    delete dialogue;
+    delete yes;
+    delete no;
+    table->close();
+    return {result, table};
+}
+
+QTableWidget* MainWindow::formTable(bool (*criteria)(File::FileTab*))
+{
+    QTableWidget* table=new QTableWidget();
+    table->setColumnCount(3);
+    table->setRowCount(fileTabs.size()+1);
+    table->setHorizontalHeaderLabels({"Modified files", "paths", "index"});
+
+    //table->setAttribute(Qt::WA_DeleteOnClose);
+    int k=0;
+    for(int i=0; i<fileTabs.size(); i++)
+    {
+        File::FileTab* ft=fileTabs[i];
+        if(criteria(ft))
+        {
+            QTableWidgetItem* fileName=new QTableWidgetItem();
+            fileName->setText(ui->FileTabs->tabText(i));
+
+            QTableWidgetItem* filePath=new QTableWidgetItem();
+            filePath->setText(ft->fileName());
+
+            QTableWidgetItem* index=new QTableWidgetItem();
+            index->setText(QString(QChar(i)));
+
+
+            table->setItem(k-1, 3, fileName);
+            table->setItem(k, 1, filePath);
+            table->setItem(k, 1, index);
+            std::cout<<"colomn count: "<<table->columnCount()<<std::endl;
+            k++;
+        }
+    }
+    table->setRowCount(k);
+    if(k==0)
+    {
+        delete table;
+        table=nullptr;
+    }
+    return table;
+}
+
+bool MainWindow::isModified(File::FileTab* ft)
+{
+    return ft->document()->isModified();
 }
 
 QString Ui::qStringOut(const QString& str, std::ostream& stream)

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <iostream>
 #include "FileTab.h"
+#include <QTableWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,10 +18,13 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
+private:
     static QString DEFAULT_PATH;
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    Ui::MainWindow *ui;
+    std::vector<File::FileTab*> fileTabs;
+    int lastCreatedTab=0;
+
+    //button funcs
     void open();
     void newFile();
     void saveFile();
@@ -36,9 +40,13 @@ public:
     //msg boxes funcs
     bool check(const QString& msg, bool condition);
     bool suggest(const QString& msg, bool condition);
-private:
-    Ui::MainWindow *ui;
-    std::vector<File::FileTab*> fileTabs;
-    int lastCreatedTab=0;
+    std::pair<bool, QTableWidget*> exitSuggest(const QString& msg);
+
+    //extra
+    QTableWidget* formTable(bool (*criteria)(File::FileTab*));
+    static bool isModified(File::FileTab* ft);
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 };
 #endif // MAINWINDOW_H
