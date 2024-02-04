@@ -23,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveFile);
     connect(ui->saveAsButton, &QPushButton::clicked, this, &MainWindow::saveAsFile);
     connect(ui->closeButton, &QPushButton::clicked, this, &MainWindow::closeFile);
+    connect(ui->saveAllButton, &QPushButton::clicked, this, &MainWindow::saveAllFiles);
+    connect(ui->closeAllButton, &QPushButton::clicked, this, &MainWindow::closeAllFiles);
+    connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::exitApp);
 }
 
 void MainWindow::open()
@@ -34,12 +37,12 @@ void MainWindow::open()
         File::FileTab* ft=new File::FileTab(Ui::binaryToQString(itr), this);
 
         //highlighting
-        if(QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".cpp") || QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".h"))
+        /*if(QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".cpp") || QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".h"))
         {
             QSyntaxHighlighter* highlighter=new Syntax::CppHighlighter(dynamic_cast<QTextEdit*>(ft)->document(), "..\\notes\\cpp.xml");
 
             dynamic_cast<File::File*>(ft)->highlighter=highlighter;
-        }
+        }*/
         ui->FileTabs->addTab(dynamic_cast<QTextEdit*>(ft), QUrl::fromLocalFile(ft->fileName()).fileName());
         this->fileTabs.push_back(ft);
     }
@@ -60,46 +63,112 @@ void MainWindow::newFile()
 
 void MainWindow::saveFile()
 {
+    saveFileByIndex(ui->FileTabs->currentIndex());
+}
+
+void MainWindow::saveFileByIndex(int i)
+{
     if(!check("Error. Nothing to save.", fileTabs.empty()))
     {
-        int i=ui->FileTabs->currentIndex();
-        QWidget* curWidget=ui->FileTabs->currentWidget();
-        if(fileTabs[i]->fileName()!="") fileTabs[i]->write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
+        QWidget* iWidget=ui->FileTabs->widget(i);
+        if(fileTabs[i]->fileName()!="") fileTabs[i]->write(dynamic_cast<QTextEdit*>(iWidget)->toPlainText());
         else
         {
-            saveAsFile();
+            saveAsFileByIndex(i);
         }
     }
 }
 
 void MainWindow::saveAsFile()
 {
-    if(!check("Error. Nothing to save as", fileTabs.empty()))
-    {
-        QWidget* curWidget=ui->FileTabs->currentWidget();
-        QString path=QFileDialog::getSaveFileName(this, "choose directory", DEFAULT_PATH);
-        File::File destination{path};
-        destination.write(dynamic_cast<QTextEdit*>(curWidget)->toPlainText());
-    }
-
-
-    /*delete
-    ui->FileTabs->removeTab(i);
-
-
-    ui->FileTabs->insertTab()*/
+    saveAsFileByIndex(ui->FileTabs->currentIndex());
 }
 
-
-int MainWindow::closeFile()
+void MainWindow::saveAsFileByIndex(int i)
 {
-    if(!check("Error. Cant close tab. No tabs are opened.", fileTabs.empty()))
+    if(!check("Error. Nothing to save as", fileTabs.empty()))
     {
-        int i=ui->FileTabs->currentIndex();
+        QWidget* iWidget=ui->FileTabs->widget(i);
+        QString path=QFileDialog::getSaveFileName(this, "choose directory to save "+ui->FileTabs->tabText(i), DEFAULT_PATH);
+        if(!path.isEmpty())
+        {
+            File::File destination{path};
+            destination.write(dynamic_cast<QTextEdit*>(iWidget)->toPlainText());
+            closeFileByIndex(i);
+            File::FileTab* ft=new File::FileTab(destination.fileName(), this);
+            fileTabs.insert(fileTabs.begin()+i, ft);
+            ui->FileTabs->insertTab(i, dynamic_cast<QWidget*>(ft), QUrl::fromLocalFile(ft->fileName()).fileName());
+            ui->FileTabs->setCurrentIndex(i);
+        }
+    }
+}
+
+int MainWindow::closeFileByIndex(int i)
+{
+    if(!check("Error. Cant close tab. No tabs are opened.", fileTabs.empty()) && !check("Error. No tab with this index", i>=fileTabs.size()))
+    {
+        if(suggest("File was modified. Would you like to save it before closing?", fileTabs[i]->document()->isModified()))
+        {
+            saveFileByIndex(i);
+        }
         fileTabs.erase(fileTabs.begin()+i);
         ui->FileTabs->removeTab(i);
         return i;
     }
+}
+
+int MainWindow::closeFile()
+{
+    return closeFileByIndex(ui->FileTabs->currentIndex());
+}
+
+
+void MainWindow::closeAllFiles()
+{
+
+    if(!check("Error. Cant close all tabs. No tabs are opened.", fileTabs.empty()))
+    {
+        for(int i=fileTabs.size()-1; i>=0; i--)
+        {
+            closeFileByIndex(i);
+        }
+    }
+}
+
+void MainWindow::saveAllFiles()
+{
+    if(!check("Error. Cant save all tabs. No tabs are opened.", fileTabs.empty()))
+    {
+        for(int i=fileTabs.size()-1; i>=0; i--)
+        {
+            saveFileByIndex(i);
+        }
+    }
+}
+
+void MainWindow::exitApp()
+{
+    if(fileTabs.empty()) close();
+    /*else
+    {
+
+    }*/
+}
+
+bool MainWindow::suggest(const QString& msg, bool condition)
+{
+    if(condition)
+    {
+
+        QMessageBox* box=new QMessageBox(this);
+        box->addButton("yes", QMessageBox::AcceptRole);
+        box->addButton("no", QMessageBox::RejectRole);
+        box->setText(msg);
+        box->setAttribute(Qt::WA_DeleteOnClose);
+        box->show();
+        return !box->exec();
+    }
+    return false;
 }
 
 QString Ui::qStringOut(const QString& str, std::ostream& stream)

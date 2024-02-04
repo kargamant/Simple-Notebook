@@ -24,9 +24,18 @@ public:
     void open();
     void newFile();
     void saveFile();
+    void saveFileByIndex(int i);
     void saveAsFile();
+    void saveAsFileByIndex(int i);
     int closeFile();
+    int closeFileByIndex(int i);
+    void closeAllFiles();
+    void saveAllFiles();
+    void exitApp();
+
+    //msg boxes funcs
     bool check(const QString& msg, bool condition);
+    bool suggest(const QString& msg, bool condition);
 private:
     Ui::MainWindow *ui;
     std::vector<File::FileTab*> fileTabs;

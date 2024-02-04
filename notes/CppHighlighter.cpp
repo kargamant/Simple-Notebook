@@ -141,12 +141,13 @@ namespace Syntax
         bool noMatches=true;
         for(Rule& rule: ruleSet)
         {
-            rule.debugRule();
+            //rule.debugRule();
             bool commentEntered=false;
             bool commentExited=false;
             QRegularExpressionMatchIterator itr=rule.pattern.globalMatch(text);
             while(itr.hasNext())
             {
+
                 noMatches=false;
                 QRegularExpressionMatch match=itr.next();
                 if(rule.name==multiLineCommentRuleStart.name || (previousBlockState()==1 && rule.name!=multiLineCommentRuleEnd.name))

@@ -9,14 +9,17 @@ namespace File
     class FileTab : public File, public QTextEdit
     {
     private:
-        //File file;
         QTextDocument doc;
-        //QTextEdit qte;
+
         void setUp();
     public:
         FileTab(const QString& filename, QWidget* parent) : File(filename), QTextEdit(parent), doc(QTextDocument())
         {
             setUp();
+        }
+        ~FileTab()
+        {
+            if(highlighter!=nullptr) delete highlighter;
         }
     };
 }

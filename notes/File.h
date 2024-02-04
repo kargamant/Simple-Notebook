@@ -11,10 +11,10 @@ namespace File
     public:
         QSyntaxHighlighter* highlighter=nullptr;
         File(const QString& filename) : QFile(filename) {}
-        ~File()
+        /*~File()
         {
             if(highlighter!=nullptr) delete highlighter;
-        }
+        }*/
         //QString getFileName();
         QString output(std::ostream& stream=std::cout);
         QString read();
