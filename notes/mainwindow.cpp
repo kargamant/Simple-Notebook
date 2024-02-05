@@ -11,6 +11,7 @@
 #include <QtQuick/qquickwindow.h>
 #include <QMessageBox>
 #include <QTableWidget>
+#include <QToolBar>
 
 QString MainWindow::DEFAULT_PATH="D:\\qt_test_sources";
 
@@ -19,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setUpMenu();
+
     connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::open);
     connect(ui->newButton, &QPushButton::clicked, this, &MainWindow::newFile);
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveFile);
@@ -28,6 +31,64 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->closeAllButton, &QPushButton::clicked, this, &MainWindow::closeAllFiles);
     connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::exitApp);
     connect(this, &MainWindow::closeSignal, this, &MainWindow::exitApp);
+}
+
+QMenu* MainWindow::setUpFileMenu()
+{
+    QMenu* fileMenu=new QMenu();
+
+    QAction* newAction=new QAction();
+    newAction->setText("New");
+    QAction* openAction=new QAction();
+    openAction->setText("Open");
+    QAction* saveFileAction=new QAction();
+    saveFileAction->setText("Save");
+    QAction* saveAsFileAction=new QAction();
+    saveAsFileAction->setText("SaveAs");
+    QAction* closeFileAction=new QAction();
+    closeFileAction->setText("closeFile");
+    QAction* saveAllFilesAction=new QAction();
+    saveAllFilesAction->setText("SaveAll");
+    QAction* closeAllFilesAction=new QAction();
+    closeAllFilesAction->setText("closeAll");
+    QAction* exitAppAction=new QAction();
+    exitAppAction->setText("exit");
+
+    connect(newAction, &QAction::triggered, this, &MainWindow::newFile);
+    connect(openAction, &QAction::triggered, this, &MainWindow::open);
+    connect(saveFileAction, &QAction::triggered, this, &MainWindow::saveFile);
+    connect(saveAsFileAction, &QAction::triggered, this, &MainWindow::saveAsFile);
+    connect(closeFileAction, &QAction::triggered, this, &MainWindow::closeFile);
+    connect(saveAllFilesAction, &QAction::triggered, this, &MainWindow::saveAllFiles);
+    connect(closeAllFilesAction, &QAction::triggered, this, &MainWindow::closeAllFiles);
+    connect(exitAppAction, &QAction::triggered, this, &MainWindow::exitApp);
+
+    actions.push_back(newAction);
+    actions.push_back(openAction);
+    actions.push_back(saveFileAction);
+    actions.push_back(saveAsFileAction);
+    actions.push_back(closeFileAction);
+    actions.push_back(saveAllFilesAction);
+    actions.push_back(closeAllFilesAction);
+    actions.push_back(exitAppAction);
+
+    for(auto action: actions)
+    {
+        fileMenu->addAction(action);
+    }
+
+    menuSections.push_back(fileMenu);
+    fileMenu->setGeometry(0, 0, 20, 20);
+    fileMenu->setTitle("File");
+    return fileMenu;
+}
+
+//QMenu* setUpEditMenu();
+void MainWindow::setUpMenu()
+{
+    menu.addMenu(setUpFileMenu());
+    menu.setGeometry(0, 0, 1600, 21);
+    menu.setParent(this);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -339,5 +400,7 @@ MainWindow::~MainWindow()
         //delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
         //delete ui->FileTabs->widget(i);
     }
+    for(int i=0; i<actions.size(); i++) delete actions[i];
+    for(int i=0; i<menuSections.size(); i++) delete menuSections[i];
     //delete ui;
 }

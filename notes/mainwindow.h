@@ -5,6 +5,7 @@
 #include <iostream>
 #include "FileTab.h"
 #include <QTableWidget>
+#include <QMenuBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -22,6 +23,9 @@ private:
     static QString DEFAULT_PATH;
     Ui::MainWindow *ui;
     std::vector<File::FileTab*> fileTabs;
+    std::vector<QAction*> actions;
+    std::vector<QMenu*> menuSections;
+    QMenuBar menu;
     int lastCreatedTab=0;
 
     //button funcs
@@ -46,6 +50,9 @@ private:
     QTableWidget* formTable(bool (*criteria)(File::FileTab*));
     static bool isModified(File::FileTab* ft);
     void closeEvent(QCloseEvent* event) override;
+    QMenu* setUpFileMenu();
+    QMenu* setUpEditMenu();
+    void setUpMenu();
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

@@ -28,6 +28,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="openButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -41,6 +44,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="newButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -54,6 +60,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="saveButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -67,6 +76,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="saveAsButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -80,6 +92,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="closeButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>400</x>
@@ -93,6 +108,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="saveAllButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>320</x>
@@ -106,6 +124,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="closeAllButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -119,6 +140,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="exitButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>560</x>
