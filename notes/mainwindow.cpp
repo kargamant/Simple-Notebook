@@ -21,6 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setUpMenu();
+    for(auto action: actionsFile)
+    {
+        toolBar.addAction(action);
+    }
+    toolBar.setGeometry(0, 0, 1600, 21);
+    addToolBar(Qt::ToolBarArea::TopToolBarArea, &toolBar);
 
     connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::open);
     connect(ui->newButton, &QPushButton::clicked, this, &MainWindow::newFile);
@@ -79,7 +85,7 @@ QMenu* MainWindow::setUpFileMenu()
     }
 
     menuSections.push_back(fileMenu);
-    fileMenu->setGeometry(0, 0, 20, 20);
+    fileMenu->setGeometry(0, 21, 20, 20);
     fileMenu->setTitle("File");
     return fileMenu;
 }
@@ -114,7 +120,7 @@ QMenu* MainWindow::setUpEditMenu()
     }
 
     menuSections.push_back(editMenu);
-    editMenu->setGeometry(20, 0, 20, 20);
+    editMenu->setGeometry(20, 21, 20, 20);
     editMenu->setTitle("Edit");
     return editMenu;
 }
@@ -135,7 +141,7 @@ void MainWindow::setUpMenu()
 {
     menu.addMenu(setUpFileMenu());
     menu.addMenu(setUpEditMenu());
-    menu.setGeometry(0, 0, 1600, 21);
+    menu.setGeometry(0, 25, 1600, 22);
     menu.setParent(this);
 }
 

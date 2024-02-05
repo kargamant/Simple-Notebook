@@ -6,6 +6,7 @@
 #include "FileTab.h"
 #include <QTableWidget>
 #include <QMenuBar>
+#include <QToolBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,6 +28,7 @@ private:
     std::vector<QAction*> actionsEdit;
     std::vector<QMenu*> menuSections;
     QMenuBar menu;
+    QToolBar toolBar;
     int lastCreatedTab=0;
 
     //button funcs
