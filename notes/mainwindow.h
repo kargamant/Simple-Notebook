@@ -23,7 +23,8 @@ private:
     static QString DEFAULT_PATH;
     Ui::MainWindow *ui;
     std::vector<File::FileTab*> fileTabs;
-    std::vector<QAction*> actions;
+    std::vector<QAction*> actionsFile;
+    std::vector<QAction*> actionsEdit;
     std::vector<QMenu*> menuSections;
     QMenuBar menu;
     int lastCreatedTab=0;
@@ -53,6 +54,7 @@ private:
     QMenu* setUpFileMenu();
     QMenu* setUpEditMenu();
     void setUpMenu();
+    void reconnect();
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

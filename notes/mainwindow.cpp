@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->closeAllButton, &QPushButton::clicked, this, &MainWindow::closeAllFiles);
     connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::exitApp);
     connect(this, &MainWindow::closeSignal, this, &MainWindow::exitApp);
+    connect(ui->FileTabs, &QTabWidget::currentChanged, this, &MainWindow::reconnect);
 }
 
 QMenu* MainWindow::setUpFileMenu()
@@ -63,16 +64,16 @@ QMenu* MainWindow::setUpFileMenu()
     connect(closeAllFilesAction, &QAction::triggered, this, &MainWindow::closeAllFiles);
     connect(exitAppAction, &QAction::triggered, this, &MainWindow::exitApp);
 
-    actions.push_back(newAction);
-    actions.push_back(openAction);
-    actions.push_back(saveFileAction);
-    actions.push_back(saveAsFileAction);
-    actions.push_back(closeFileAction);
-    actions.push_back(saveAllFilesAction);
-    actions.push_back(closeAllFilesAction);
-    actions.push_back(exitAppAction);
+    actionsFile.push_back(newAction);
+    actionsFile.push_back(openAction);
+    actionsFile.push_back(saveFileAction);
+    actionsFile.push_back(saveAsFileAction);
+    actionsFile.push_back(closeFileAction);
+    actionsFile.push_back(saveAllFilesAction);
+    actionsFile.push_back(closeAllFilesAction);
+    actionsFile.push_back(exitAppAction);
 
-    for(auto action: actions)
+    for(auto action: actionsFile)
     {
         fileMenu->addAction(action);
     }
@@ -83,10 +84,57 @@ QMenu* MainWindow::setUpFileMenu()
     return fileMenu;
 }
 
-//QMenu* setUpEditMenu();
+QMenu* MainWindow::setUpEditMenu()
+{
+    QMenu* editMenu=new QMenu();
+
+    QAction* cutAction=new QAction();
+    cutAction->setText("Cut");
+    connect(cutAction, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::cut);
+    actionsEdit.push_back(cutAction);
+
+    QAction* copyAction = new QAction();
+    copyAction->setText("Copy");
+    connect(copyAction, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::copy);
+    actionsEdit.push_back(copyAction);
+
+    QAction* pasteAction = new QAction();
+    pasteAction->setText("Paste");
+    connect(pasteAction, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::paste);
+    actionsEdit.push_back(pasteAction);
+
+    QAction* selectAllAction = new QAction();
+    selectAllAction->setText("Select All");
+    connect(selectAllAction, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::selectAll);
+    actionsEdit.push_back(selectAllAction);
+
+    for(auto action: actionsEdit)
+    {
+        editMenu->addAction(action);
+    }
+
+    menuSections.push_back(editMenu);
+    editMenu->setGeometry(20, 0, 20, 20);
+    editMenu->setTitle("Edit");
+    return editMenu;
+}
+
+
+void MainWindow::reconnect()
+{
+    for(auto action: actionsEdit)
+    {
+        if(action->text()=="Cut") connect(action, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::cut);
+        else if(action->text()=="Copy") connect(action, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::copy);
+        else if(action->text()=="Paste") connect(action, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::paste);
+        else if(action->text()=="Select All") connect(action, &QAction::triggered, dynamic_cast<QTextEdit*>(ui->FileTabs->currentWidget()), &QTextEdit::selectAll);
+    }
+}
+
 void MainWindow::setUpMenu()
 {
     menu.addMenu(setUpFileMenu());
+    menu.addMenu(setUpEditMenu());
     menu.setGeometry(0, 0, 1600, 21);
     menu.setParent(this);
 }
@@ -400,7 +448,8 @@ MainWindow::~MainWindow()
         //delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
         //delete ui->FileTabs->widget(i);
     }
-    for(int i=0; i<actions.size(); i++) delete actions[i];
+    for(int i=0; i<actionsFile.size(); i++) delete actionsFile[i];
+    for(int i=0; i<actionsEdit.size(); i++) delete actionsEdit[i];
     for(int i=0; i<menuSections.size(); i++) delete menuSections[i];
     //delete ui;
 }
