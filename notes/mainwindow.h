@@ -45,8 +45,11 @@ private:
     //extra
     QTableWidget* formTable(bool (*criteria)(File::FileTab*));
     static bool isModified(File::FileTab* ft);
+    void closeEvent(QCloseEvent* event) override;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+signals:
+    void closeSignal();
 };
 #endif // MAINWINDOW_H

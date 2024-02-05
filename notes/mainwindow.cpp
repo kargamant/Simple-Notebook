@@ -27,6 +27,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->saveAllButton, &QPushButton::clicked, this, &MainWindow::saveAllFiles);
     connect(ui->closeAllButton, &QPushButton::clicked, this, &MainWindow::closeAllFiles);
     connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::exitApp);
+    connect(this, &MainWindow::closeSignal, this, &MainWindow::exitApp);
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    emit closeSignal();
+    event->accept();
 }
 
 void MainWindow::open()
