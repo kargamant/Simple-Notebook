@@ -163,12 +163,27 @@ void MainWindow::exitApp()
             QTableWidget* table=answer.second;
             for(int i=0; i<table->rowCount(); i++)
             {
+                int index=table->item(i, 2)->text().toInt();
+                saveFileByIndex(index);
+            }
+
+            for(int i=0; i<table->rowCount(); i++)
+            {
+                for(int j=0; j<table->columnCount(); j++)
+                {
+                    delete table->item(i, j);
+                }
+            }
+            delete table;
+            close();
+            /*for(int i=0; i<table->rowCount(); i++)
+            {
                 for(int j=0; j<table->columnCount(); j++)
                 {
                     std::cout<<"item "<<i<<" "<<j<<": ";
                     Ui::qStringOut(table->item(i, j)->text());
                 }
-            }
+            }*/
         }
     }
 }
@@ -246,13 +261,13 @@ QTableWidget* MainWindow::formTable(bool (*criteria)(File::FileTab*))
             filePath->setText(ft->fileName());
 
             QTableWidgetItem* index=new QTableWidgetItem();
-            index->setText(QString(QChar(i)));
+            index->setText(QString::fromStdString(std::to_string(i)));
 
 
-            table->setItem(k-1, 3, fileName);
+            table->setItem(k, 0, fileName);
             table->setItem(k, 1, filePath);
-            table->setItem(k, 1, index);
-            std::cout<<"colomn count: "<<table->columnCount()<<std::endl;
+            table->setItem(k, 2, index);
+            //std::cout<<"colomn count: "<<table->columnCount()<<std::endl;
             k++;
         }
     }
