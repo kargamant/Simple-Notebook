@@ -7,6 +7,7 @@
 
 namespace Syntax
 {
+    //rule structure
     struct Rule
     {
         QString name;

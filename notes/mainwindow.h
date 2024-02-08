@@ -20,7 +20,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    static QString DEFAULT_PATH;
+
+    static QString DEFAULT_PATH; //location where file explorer will be opened
     Ui::MainWindow *ui;
     std::vector<File::FileTab*> fileTabs;
     std::vector<QAction*> actionsFile;
@@ -29,7 +30,7 @@ private:
     QMenuBar menu;
     int lastCreatedTab=0;
 
-    //button funcs
+    //action funcs
     void open();
     void newFile();
     void saveFile();
@@ -50,11 +51,13 @@ private:
     //extra
     QTableWidget* formTable(bool (*criteria)(File::FileTab*));
     static bool isModified(File::FileTab* ft);
-    void closeEvent(QCloseEvent* event) override;
     QMenu* setUpFileMenu();
     QMenu* setUpEditMenu();
     void setUpMenu();
     void reconnect();
+
+    //overriding qt member funcs
+    void closeEvent(QCloseEvent* event) override;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

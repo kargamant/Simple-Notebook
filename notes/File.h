@@ -11,15 +11,9 @@ namespace File
     public:
         QSyntaxHighlighter* highlighter=nullptr;
         File(const QString& filename) : QFile(filename) {}
-        /*~File()
-        {
-            if(highlighter!=nullptr) delete highlighter;
-        }*/
-        //QString getFileName();
         QString output(std::ostream& stream=std::cout);
         QString read();
         void write(const QString& newContent);
-        //QString highlight();
     };
 }
 #endif // FILE_H

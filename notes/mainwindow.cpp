@@ -7,8 +7,6 @@
 #include "CppHighlighter.h"
 #include <fstream>
 #include "FileTab.h"
-#include <QWindow>
-#include <QtQuick/qquickwindow.h>
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QToolBar>
@@ -22,14 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setUpMenu();
 
-    connect(ui->openButton, &QPushButton::clicked, this, &MainWindow::open);
-    connect(ui->newButton, &QPushButton::clicked, this, &MainWindow::newFile);
-    connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveFile);
-    connect(ui->saveAsButton, &QPushButton::clicked, this, &MainWindow::saveAsFile);
-    connect(ui->closeButton, &QPushButton::clicked, this, &MainWindow::closeFile);
-    connect(ui->saveAllButton, &QPushButton::clicked, this, &MainWindow::saveAllFiles);
-    connect(ui->closeAllButton, &QPushButton::clicked, this, &MainWindow::closeAllFiles);
-    connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::exitApp);
     connect(this, &MainWindow::closeSignal, this, &MainWindow::exitApp);
     connect(ui->FileTabs, &QTabWidget::currentChanged, this, &MainWindow::reconnect);
 }
@@ -153,13 +143,6 @@ void MainWindow::open()
     {
         File::FileTab* ft=new File::FileTab(Ui::binaryToQString(itr), this);
 
-        //highlighting
-        /*if(QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".cpp") || QUrl::fromLocalFile(ft->fileName()).fileName().endsWith(".h"))
-        {
-            QSyntaxHighlighter* highlighter=new Syntax::CppHighlighter(dynamic_cast<QTextEdit*>(ft)->document(), "..\\notes\\cpp.xml");
-
-            dynamic_cast<File::File*>(ft)->highlighter=highlighter;
-        }*/
         ui->FileTabs->addTab(dynamic_cast<QTextEdit*>(ft), QUrl::fromLocalFile(ft->fileName()).fileName());
         this->fileTabs.push_back(ft);
     }
@@ -292,14 +275,6 @@ void MainWindow::exitApp()
             }
             delete table;
             close();
-            /*for(int i=0; i<table->rowCount(); i++)
-            {
-                for(int j=0; j<table->columnCount(); j++)
-                {
-                    std::cout<<"item "<<i<<" "<<j<<": ";
-                    Ui::qStringOut(table->item(i, j)->text());
-                }
-            }*/
         }
     }
 }
@@ -340,15 +315,9 @@ std::pair<bool, QTableWidget*> MainWindow::exitSuggest(const QString& msg)
     connect(yes, &QPushButton::clicked, dialogue, &QDialog::accept);
     connect(no, &QPushButton::clicked, dialogue, &QDialog::reject);
 
-    //dialogue->setAttribute(Qt::WA_DeleteOnClose);
-    //yes->setAttribute(Qt::WA_DeleteOnClose);
-    //no->setAttribute(Qt::WA_DeleteOnClose);
     table->show();
 
     bool result=dialogue->exec();
-    //dialogue->close();
-    //yes->close();
-    //no->close();
     delete dialogue;
     delete yes;
     delete no;
@@ -363,7 +332,6 @@ QTableWidget* MainWindow::formTable(bool (*criteria)(File::FileTab*))
     table->setRowCount(fileTabs.size()+1);
     table->setHorizontalHeaderLabels({"Modified files", "paths", "index"});
 
-    //table->setAttribute(Qt::WA_DeleteOnClose);
     int k=0;
     for(int i=0; i<fileTabs.size(); i++)
     {
@@ -383,7 +351,6 @@ QTableWidget* MainWindow::formTable(bool (*criteria)(File::FileTab*))
             table->setItem(k, 0, fileName);
             table->setItem(k, 1, filePath);
             table->setItem(k, 2, index);
-            //std::cout<<"colomn count: "<<table->columnCount()<<std::endl;
             k++;
         }
     }
@@ -444,9 +411,6 @@ MainWindow::~MainWindow()
     for(int i=0; i<fileTabs.size(); i++)
     {
         delete fileTabs[i];
-        //delete files[i];
-        //delete dynamic_cast<QTextEdit*>(ui->FileTabs->widget(i))->document();
-        //delete ui->FileTabs->widget(i);
     }
     for(int i=0; i<actionsFile.size(); i++) delete actionsFile[i];
     for(int i=0; i<actionsEdit.size(); i++) delete actionsEdit[i];

@@ -16,7 +16,6 @@ QString File::output(std::ostream& stream)
     QString File::read()
     {
         QString content;
-        //if(!this->exists()) std::cout<<("Error. File with this filename does not exist");
         this->open(QIODeviceBase::ReadOnly);
 
 
@@ -37,11 +36,5 @@ QString File::output(std::ostream& stream)
         file<<newContent.toStdString();
         file.close();
     }
-    /*void File::save()
-    {
-        std::ofstream file;
-        file.open(fileName().toStdString());
-
-    }*/
 
 }
